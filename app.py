@@ -70,27 +70,27 @@ def get_bus():
                 Vers {direction_label}
             </div>
 
-            <div style="font-size: 62px; font-weight: 800; line-height: 1; margin: 10px 0 20px 0; letter-spacing: -3px;">
+            <div style="font-size: 60px; font-weight: 800; line-height: 1; margin: 5px 0 15px 0; letter-spacing: -3px;">
                 {bus1}
             </div>
 
-            <div style="border-top: 1px dotted #aaa; width: 60%; margin-bottom: 15px;"></div>
+            <div style="border-top: 1px dotted #aaa; width: 60%; margin-bottom: 10px;"></div>
 
-            <div style="display: flex; justify-content: center; gap: 25px; margin-top: auto; padding-bottom: 10px;">
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: auto; padding-bottom: 5px;">
                 
                 <div style="display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 9px; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px;">Suivant</span>
-                    <strong style="font-size: 20px;">{bus2}</strong>
+                    <span style="font-size: 10px; text-transform: uppercase; opacity: 0.6; margin-bottom: 2px;">Suivant</span>
+                    <strong style="font-size: 28px; line-height: 1;">{bus2}</strong>
                 </div>
 
                 <div style="display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 9px; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px;">Ensuite</span>
-                    <strong style="font-size: 20px;">{bus3}</strong>
+                    <span style="font-size: 10px; text-transform: uppercase; opacity: 0.6; margin-bottom: 2px;">Ensuite</span>
+                    <strong style="font-size: 28px; line-height: 1;">{bus3}</strong>
                 </div>
 
                 <div style="display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 9px; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px;">Plus tard</span>
-                    <strong style="font-size: 20px;">{bus4}</strong>
+                    <span style="font-size: 10px; text-transform: uppercase; opacity: 0.6; margin-bottom: 2px;">+ Tard</span>
+                    <strong style="font-size: 28px; line-height: 1;">{bus4}</strong>
                 </div>
 
             </div>
