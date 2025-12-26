@@ -1,33 +1,54 @@
 from flask import Flask, jsonify
 import requests
-import os
+import datetime
 
 app = Flask(__name__)
 
+# Clé API Officielle (IDFM)
+PRIM_KEY = "CzyhmgXXqA0IfjxTt0pAFp3LVr5m2mqY"
+
 @app.route('/')
 def get_bus():
-    # L'API Grimaud (ne sera pas bloquée ici !)
-    url = "https://api-ratp.pierre-grimaud.fr/v3/schedules/bus/123/rue+du+point+du+jour/A"
-
+    # Arrêt "Rue du Point du Jour" (Ligne 123) - Code IDFM exact
+    # On demande les prochains passages
+    url = "https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/stops/IDFM:463158/stop_schedules?line_id=IDFM:C01375"
+    headers = {"apiKey": PRIM_KEY}
+    
     try:
-        response = requests.get(url, timeout=10)
-        data = response.json()
-        schedules = data.get('result', {}).get('schedules', [])
+        # Timeout très court (3s) pour ne pas faire attendre TRMNL
+        r = requests.get(url, headers=headers, timeout=3)
+        data = r.json()
+        
+        # On fouille dans la réponse compliquée de l'API officielle
+        schedules = data['stop_schedules'][0]['date_times']
+        
+        # On calcule les minutes restantes
+        now = datetime.datetime.now()
+        departs = []
+        
+        for s in schedules:
+            # Format date API: YYYYMMDDThhmmss
+            time_str = s['date_time']
+            # On extrait juste l'heure HH:MM
+            heure_bus = time_str.split('T')[1][:4] # ex: 1845
+            h = int(heure_bus[:2])
+            m = int(heure_bus[2:])
+            
+            # Calcul approximatif (l'API donne l'heure exacte, pas les minutes)
+            # Pour faire simple on affiche l'heure "18h45"
+            departs.append(f"{h}h{m:02d}")
 
-        if not schedules:
-            return jsonify({"markup": "Pas d'horaire trouvé."})
-
-        bus1 = schedules[0]['message'].replace("mn", " min").replace("min", " min")
-        bus2 = schedules[1]['message'].replace("mn", " min") if len(schedules) > 1 else "--"
-        dest = schedules[0]['destination']
-
+        # Si on a trouvé des bus
+        bus1 = departs[0] if len(departs) > 0 else "--"
+        bus2 = departs[1] if len(departs) > 1 else "--"
+        
         html = f"""
         <div class="layout">
             <div class="title">Bus 123</div>
             <div class="content">
                 <div class="item">
                     <span class="label">Vers</span>
-                    <span class="value">{dest}</span>
+                    <span class="value">Mairie d'Issy</span>
                 </div>
                 <hr style="opacity:0.2; margin: 5px 0;"> 
                 <div class="item">
@@ -39,13 +60,23 @@ def get_bus():
                     <span class="value">{bus2}</span>
                 </div>
             </div>
+            <div class="footer">IDFM Officiel</div>
         </div>
         """
-        return jsonify({"markup": html, "refresh_in_seconds": 120})
+        return jsonify({"markup": html})
 
     except Exception as e:
-        return jsonify({"markup": f"Erreur: {str(e)}"})
+        # En cas d'erreur, on affiche quand même quelque chose pour ne pas avoir d'écran noir
+        fallback = f"""
+        <div class="layout">
+            <div class="title">Bus 123</div>
+            <div class="content">
+                Maintenance API<br/>
+                <span style="font-size:15px">Erreur: {str(e)[:20]}...</span>
+            </div>
+        </div>
+        """
+        return jsonify({"markup": fallback})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=5000)
